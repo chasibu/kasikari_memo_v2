@@ -10,6 +10,12 @@ class _MyInputFormState extends State<InputForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final PromiseModel _promise = PromiseModel("borrow", "", "", DateTime.now());
 
+  void _setLendOrRent(String value){
+    setState(() {
+      _promise.borrowOrLend = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +50,7 @@ class _MyInputFormState extends State<InputForm> {
                 title: Text("借りた"),
                 onChanged: (String? value){
                   print("借りたをタッチしました");
+                  _setLendOrRent(value!);
                 },
               ),
               RadioListTile(
@@ -52,6 +59,7 @@ class _MyInputFormState extends State<InputForm> {
                   title: Text("貸した"),
                   onChanged: (String? value) {
                     print("貸したをタッチしました");
+                    _setLendOrRent(value!);
                   }
               ),
 

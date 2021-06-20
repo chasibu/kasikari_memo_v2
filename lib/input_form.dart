@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'promise_model.dart';
 
 class InputForm extends StatefulWidget {
@@ -27,6 +28,8 @@ class _MyInputFormState extends State<InputForm> {
 
   @override
   Widget build(BuildContext context) {
+    DocumentReference _mainReference =
+      FirebaseFirestore.instance.collection('promises').doc();
     return Scaffold(
       appBar: AppBar(
         title: const Text('かしかり入力'),
@@ -35,6 +38,18 @@ class _MyInputFormState extends State<InputForm> {
               icon: Icon(Icons.save),
               onPressed: () {
                 print("保存ボタンを押しました");
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  _mainReference.set(
+                    {
+                      'borrowOrLend': _promise.borrowOrLend,
+                      'user': _promise.user,
+                      'stuff': _promise.stuff,
+                      'date': _promise.date
+                    }
+                  );
+                  Navigator.pop(context);
+                }
               }
           ),
           IconButton(

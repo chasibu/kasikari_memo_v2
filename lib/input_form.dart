@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'promise_model.dart';
 
 class InputForm extends StatefulWidget {
+  final DocumentSnapshot? document;
+  InputForm(this.document);
+
   @override
   _MyInputFormState createState() => _MyInputFormState();
 }
@@ -30,6 +33,19 @@ class _MyInputFormState extends State<InputForm> {
   Widget build(BuildContext context) {
     DocumentReference _mainReference =
       FirebaseFirestore.instance.collection('promises').doc();
+
+    if(widget.document != null) {
+      // 日付・貸し借り情報更新時に、再buildされるため、値が更新されるのを防ぐ
+      if(_promise.user == "" && _promise.stuff == "") {
+        _promise.borrowOrLend = widget.document!['borrowOrLend'];
+        _promise.user = widget.document!['user'];
+        _promise.stuff = widget.document!['stuff'];
+        _promise.date = widget.document!['date'].toDate();
+      }
+      _mainReference = FirebaseFirestore.instance.
+      collection('promises').doc(widget.document!.id);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('かしかり入力'),

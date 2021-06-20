@@ -31,6 +31,12 @@ class _MyList extends State<List> {
             }
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          print("新規作成ボタンを押しました");
+        }
+      ),
     );
   }
 
@@ -45,14 +51,27 @@ class _MyList extends State<List> {
 
     return Card(
       child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.android),
-              title: Text("【$borrowOrLend】：${document['stuff']}"),
-              subtitle: Text(" 期限：$limitDate\n 相手：${document['user']}"),
-            ),
-          ]
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.android),
+            title: Text("【$borrowOrLend】：${document['stuff']}"),
+            subtitle: Text(" 期限：$limitDate\n 相手：${document['user']}"),
+          ),
+          ButtonBarTheme(
+            data: ButtonBarThemeData(buttonTextTheme: ButtonTextTheme.accent),
+            child: ButtonBar(
+              children: <Widget>[
+                TextButton(
+                  child: const Text("へんしゅう"),
+                  onPressed: () {
+                    print("編集ボタンを押しました");
+                  }
+                ),
+              ],
+            )
+          ),
+        ]
       ),
     );
   }

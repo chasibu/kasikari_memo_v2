@@ -33,7 +33,7 @@ class _MyInputFormState extends State<InputForm> {
   Widget build(BuildContext context) {
     DocumentReference _mainReference =
       FirebaseFirestore.instance.collection('promises').doc();
-
+    bool isDeleteDocument = false;
     if(widget.document != null) {
       // 日付・貸し借り情報更新時に、再buildされるため、値が更新されるのを防ぐ
       if(_promise.user == "" && _promise.stuff == "") {
@@ -43,7 +43,8 @@ class _MyInputFormState extends State<InputForm> {
         _promise.date = widget.document!['date'].toDate();
       }
       _mainReference = FirebaseFirestore.instance.
-      collection('promises').doc(widget.document!.id);
+        collection('promises').doc(widget.document!.id);
+      isDeleteDocument = true;
     }
 
     return Scaffold(
@@ -71,9 +72,15 @@ class _MyInputFormState extends State<InputForm> {
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              print("削除ボタンを押しました");
-            },
-          ),
+              if (isDeleteDocument) {
+                print("削除ボタンを押しました");
+                _mainReference.delete();
+                Navigator.pop(context);
+              } else {
+                return null;
+              }
+            }
+          )
         ],
       ),
       body: SafeArea(

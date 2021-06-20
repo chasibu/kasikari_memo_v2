@@ -96,6 +96,14 @@ class _MyInputFormState extends State<InputForm> {
                 onSaved: (String? value) {
                   _promise.user = value!;
                 },
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return '名前は必須入力です';
+                  } else {
+                    return null;
+                  }
+                },
+                initialValue: _promise.user,
               ),
 
               TextFormField(
@@ -107,6 +115,14 @@ class _MyInputFormState extends State<InputForm> {
                 onSaved: (String? value) {
                   _promise.stuff = value!;
                 },
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return '借りたもの、貸したものは必須入力です';
+                  } else {
+                    return null;
+                  }
+                },
+                initialValue: _promise.stuff,
               ),
 
               Padding(

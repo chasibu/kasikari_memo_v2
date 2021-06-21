@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'promise_model.dart';
+import 'user_auth.dart';
 
 class InputForm extends StatefulWidget {
   final DocumentSnapshot? document;
@@ -32,7 +33,9 @@ class _MyInputFormState extends State<InputForm> {
   @override
   Widget build(BuildContext context) {
     DocumentReference _mainReference =
-      FirebaseFirestore.instance.collection('promises').doc();
+      FirebaseFirestore.instance.
+      collection('users').doc(userAuth.currentUser!.uid).
+      collection('promises').doc();
     bool isDeleteDocument = false;
     if(widget.document != null) {
       // 日付・貸し借り情報更新時に、再buildされるため、値が更新されるのを防ぐ
@@ -43,6 +46,7 @@ class _MyInputFormState extends State<InputForm> {
         _promise.date = widget.document!['date'].toDate();
       }
       _mainReference = FirebaseFirestore.instance.
+        collection('users').doc(userAuth.currentUser!.uid).
         collection('promises').doc(widget.document!.id);
       isDeleteDocument = true;
     }

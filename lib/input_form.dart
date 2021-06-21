@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share/share.dart';
 
+import 'generated/l10n.dart';
 import 'promise_model.dart';
 import 'user_auth.dart';
 
@@ -55,7 +56,7 @@ class _MyInputFormState extends State<InputForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('かしかり入力'),
+        title: Text(S.of(context).input_form),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.save),
@@ -92,12 +93,12 @@ class _MyInputFormState extends State<InputForm> {
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 String _borrowOrLend =
-                _promise.borrowOrLend  == "lend" ? "貸" : "借";
+                _promise.borrowOrLend  == "lend" ? S.of(context).lend : S.of(context).borrow;
                 Share.share(
                   "【 $_borrowOrLend 】${_promise.stuff}\n"
-                  "期限：${_promise.date.toString().substring(0,10)}\n"
-                  "相手：${_promise.user}\n"
-                  "#かしかりメモ"
+                  + S.of(context).limit + "：${_promise.date.toString().substring(0,10)}\n"
+                  + S.of(context).who(_promise.user)+ "\n"
+                  + S.of(context).hash_tag
                 );
               }
             },
@@ -115,7 +116,7 @@ class _MyInputFormState extends State<InputForm> {
               RadioListTile(
                 value: "borrow",
                 groupValue: _promise.borrowOrLend,
-                title: Text("借りた"),
+                title: Text(S.of(context).registration_borrow),
                 onChanged: (String? value){
                   print("借りたをタッチしました");
                   _setLendOrRent(value!);
@@ -124,7 +125,7 @@ class _MyInputFormState extends State<InputForm> {
               RadioListTile(
                   value: "lend",
                   groupValue: _promise.borrowOrLend,
-                  title: Text("貸した"),
+                  title: Text(S.of(context).registration_lend),
                   onChanged: (String? value) {
                     print("貸したをタッチしました");
                     _setLendOrRent(value!);
@@ -134,7 +135,7 @@ class _MyInputFormState extends State<InputForm> {
               TextFormField(
                 decoration: InputDecoration(
                   icon: const Icon(Icons.person),
-                  hintText: (_promise.borrowOrLend == "lend" ? "貸した人" : "借りた人"),
+                  hintText: ( _promise.borrowOrLend == "lend" ? S.of(context).registration_name_lend : S.of(context).registration_name_borrow),
                   labelText: 'Name',
                 ),
                 onSaved: (String? value) {
@@ -142,7 +143,7 @@ class _MyInputFormState extends State<InputForm> {
                 },
                 validator: (value) {
                   if(value!.isEmpty) {
-                    return '名前は必須入力です';
+                    return S.of(context).validate_name;
                   } else {
                     return null;
                   }
@@ -153,7 +154,7 @@ class _MyInputFormState extends State<InputForm> {
               TextFormField(
                 decoration: InputDecoration(
                   icon: const Icon(Icons.business_center),
-                  hintText: (_promise.borrowOrLend == "lend" ? "貸したもの" : "借りたもの"),
+                  hintText: ( _promise.borrowOrLend == "lend" ? S.of(context).registration_loan_lend : S.of(context).registration_loan_borrow),
                   labelText: 'loan',
                 ),
                 onSaved: (String? value) {
@@ -161,7 +162,7 @@ class _MyInputFormState extends State<InputForm> {
                 },
                 validator: (value) {
                   if(value!.isEmpty) {
-                    return '借りたもの、貸したものは必須入力です';
+                    return S.of(context).validate_loan;
                   } else {
                     return null;
                   }
@@ -171,13 +172,11 @@ class _MyInputFormState extends State<InputForm> {
 
               Padding(
                 padding: const EdgeInsets.only(top:8.0),
-                child: Text(
-                    "締め切り日：${_promise.date.toString().substring(0,10)}"
-                ),
+                child: Text(S.of(context).deadline(_promise.date.toString().substring(0,10))),
               ),
 
               ElevatedButton(
-                child: const Text("締め切り日変更"),
+                child: Text(S.of(context).change_deadline),
                 onPressed: (){
                   print("締め切り日変更をタッチしました");
                   _selectTime(context).then((time){

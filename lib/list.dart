@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'generated/l10n.dart';
 import 'user_auth.dart';
 import 'input_form.dart';
 
@@ -15,7 +16,7 @@ class _MyList extends State<List> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("かしかりメモ"),
+        title: Text(S.of(context).title),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -36,7 +37,7 @@ class _MyList extends State<List> {
               if (!snapshot.hasData) return
                 Center(child: CircularProgressIndicator());
               if (snapshot.data?.docs.length == 0) return
-                Center(child: Text("データが登録されていません"));
+                Center(child: Text(S.of(context).list_no_data));
               return ListView.builder(
                 itemCount: snapshot.data?.docs.length,
                 padding: const EdgeInsets.only(top: 10.0),
@@ -66,9 +67,9 @@ class _MyList extends State<List> {
     String borrowOrLend;
     String limitDate = document['date'].toDate().toString().substring(0,10);
     if (document['borrowOrLend'] == "lend") {
-      borrowOrLend = "貸";
+      borrowOrLend = S.of(context).lend;
     } else {
-      borrowOrLend = "借";
+      borrowOrLend = S.of(context).borrow;
     }
 
     return Card(
@@ -78,14 +79,14 @@ class _MyList extends State<List> {
           ListTile(
             leading: const Icon(Icons.android),
             title: Text("【$borrowOrLend】：${document['stuff']}"),
-            subtitle: Text(" 期限：$limitDate\n 相手：${document['user']}"),
+            subtitle: Text("${S.of(context).deadline(limitDate)}\n ${S.of(context).who(document['user'])}"),
           ),
           ButtonBarTheme(
             data: ButtonBarThemeData(buttonTextTheme: ButtonTextTheme.accent),
             child: ButtonBar(
               children: <Widget>[
                 TextButton(
-                  child: const Text("へんしゅう"),
+                  child: Text(S.of(context).edit),
                   onPressed: () {
                     print("編集ボタンを押しました");
                     Navigator.push(
@@ -114,7 +115,7 @@ class _MyList extends State<List> {
         context: context,
         builder: (BuildContext context) =>
             AlertDialog(
-              title: Text("ログイン/登録ダイアログ"),
+              title: Text(S.of(context).login_register),
               content: Form(
                 key: _formKey,
                 child: Column(
@@ -129,7 +130,7 @@ class _MyList extends State<List> {
                       },
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Emailは必須入力項目です';
+                          return S.of(context).validate_mail;
                         } else {
                           return null;
                         }
@@ -146,9 +147,9 @@ class _MyList extends State<List> {
                       },
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Passwordは必須入力項目です';
+                          return S.of(context).validate_password_present;
                         } else if (value.length<6) {
-                          return 'Passwordは6桁以上です';
+                          return S.of(context).validate_password_minimum_length;
                         } else {
                           return null;
                         }
@@ -160,13 +161,13 @@ class _MyList extends State<List> {
               // ボタンの配置
               actions: <Widget>[
                 TextButton(
-                    child: Text('キャンセル'),
+                    child: Text(S.of(context).cancel),
                     onPressed: () {
                       Navigator.pop(context);
                     }
                 ),
                 TextButton(
-                    child: Text('登録'),
+                    child: Text(S.of(context).registration),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
@@ -177,7 +178,7 @@ class _MyList extends State<List> {
                     }
                 ),
                 TextButton(
-                    child: Text('ログイン'),
+                    child: Text(S.of(context).login),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
@@ -195,18 +196,17 @@ class _MyList extends State<List> {
         context: context,
         builder: (BuildContext context) =>
             AlertDialog(
-              title: Text("確認ダイアログ"),
-              content:
-              Text(userAuth.currentUser!.email! + " でログインしています。"),
+              title: Text(S.of(context).dialog),
+              content: Text(S.of(context).login_user("${userAuth.currentUser!.email}")),
               actions: <Widget>[
                 TextButton(
-                    child: Text('キャンセル'),
+                    child: Text(S.of(context).cancel),
                     onPressed: () {
                       Navigator.pop(context);
                     }
                 ),
                 TextButton(
-                    child: Text('ログアウト'),
+                    child: Text(S.of(context).logout),
                     onPressed: () async {
                       await _signOut();
                       Navigator.
@@ -225,7 +225,7 @@ class _MyList extends State<List> {
       await userAuth.signInAnonymously();
     } catch(e) {
       print(e);
-      Fluttertoast.showToast(msg: "Firebaseのログインに失敗しました。");
+      Fluttertoast.showToast(msg: S.of(context).fail_logout_firebase);
     }
   }
 
@@ -235,7 +235,7 @@ class _MyList extends State<List> {
       await userAuth.signInWithEmailAndPassword(email: email, password: password);
     } catch(e) {
       print(e);
-      Fluttertoast.showToast(msg: "Firebaseのログインに失敗しました。");
+      Fluttertoast.showToast(msg: S.of(context).fail_login_firebase);
     }
   }
 
@@ -245,7 +245,7 @@ class _MyList extends State<List> {
       createUserWithEmailAndPassword(email: email, password: password);
     } catch(e) {
       print(e);
-      Fluttertoast.showToast(msg: "Firebaseの登録に失敗しました。");
+      Fluttertoast.showToast(msg: S.of(context).fail_registration_firebase);
     }
   }
 }

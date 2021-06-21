@@ -29,7 +29,9 @@ class _MyList extends State<List> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('promises').snapshots(),
+            stream: FirebaseFirestore.instance.collection('users').
+                    doc(userAuth.currentUser!.uid).
+                    collection("promises").snapshots(),
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
               if (!snapshot.hasData) return
                 Center(child: CircularProgressIndicator());

@@ -30,5 +30,6 @@ class Initialize extends StatelessWidget {
     if (userAuth.currentUser == null) {
       await userAuth.signInAnonymously();
     }
+    await Future.delayed(Duration(seconds: 1));
   }
 }

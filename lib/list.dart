@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import 'user_auth.dart';
 import 'input_form.dart';
 
 class List extends StatefulWidget {
@@ -14,6 +16,15 @@ class _MyList extends State<List> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("かしかりメモ"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () {
+              print("ログインボタンを押しました。");
+              showBasicDialog(context);
+            },
+          )
+        ]
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -90,5 +101,149 @@ class _MyList extends State<List> {
         ]
       ),
     );
+  }
+
+  void showBasicDialog(BuildContext context) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    String email = "";
+    String password = "";
+    if(userAuth.currentUser!.isAnonymous) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: Text("ログイン/登録ダイアログ"),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        icon: const Icon(Icons.mail),
+                        labelText: 'Email',
+                      ),
+                      onSaved: (String? value) {
+                        email = value!;
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Emailは必須入力項目です';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    TextFormField(
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        icon: const Icon(Icons.vpn_key),
+                        labelText: 'Password',
+                      ),
+                      onSaved: (String? value) {
+                        password = value!;
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Passwordは必須入力項目です';
+                        } else if (value.length<6) {
+                          return 'Passwordは6桁以上です';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              // ボタンの配置
+              actions: <Widget>[
+                TextButton(
+                    child: Text('キャンセル'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    }
+                ),
+                TextButton(
+                    child: Text('登録'),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        await _createUser(context, email, password);
+                      }
+                      Navigator.
+                      pushNamedAndRemoveUntil(context, "/list", (_) => false);
+                    }
+                ),
+                TextButton(
+                    child: Text('ログイン'),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        await _signIn(context, email, password);
+                      }
+                      Navigator.
+                      pushNamedAndRemoveUntil(context, "/list", (_) => false);
+                    }
+                ),
+              ],
+            ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: Text("確認ダイアログ"),
+              content:
+              Text(userAuth.currentUser!.email! + " でログインしています。"),
+              actions: <Widget>[
+                TextButton(
+                    child: Text('キャンセル'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    }
+                ),
+                TextButton(
+                    child: Text('ログアウト'),
+                    onPressed: () async {
+                      await _signOut();
+                      Navigator.
+                      pushNamedAndRemoveUntil(context, "/list", (_) => false);
+                    }
+                ),
+              ],
+            ),
+      );
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await userAuth.signOut();
+      await userAuth.signInAnonymously();
+    } catch(e) {
+      print(e);
+      Fluttertoast.showToast(msg: "Firebaseのログインに失敗しました。");
+    }
+  }
+
+
+  Future<void> _signIn(BuildContext context,String email, String password) async {
+    try {
+      await userAuth.signInWithEmailAndPassword(email: email, password: password);
+    } catch(e) {
+      print(e);
+      Fluttertoast.showToast(msg: "Firebaseのログインに失敗しました。");
+    }
+  }
+
+  Future<void> _createUser(BuildContext context,String email, String password) async {
+    try {
+      await userAuth.
+      createUserWithEmailAndPassword(email: email, password: password);
+    } catch(e) {
+      print(e);
+      Fluttertoast.showToast(msg: "Firebaseの登録に失敗しました。");
+    }
   }
 }

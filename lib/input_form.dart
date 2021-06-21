@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:share/share.dart';
+
 import 'promise_model.dart';
 import 'user_auth.dart';
 
@@ -84,6 +86,21 @@ class _MyInputFormState extends State<InputForm> {
                 return null;
               }
             }
+          ),
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                String _borrowOrLend =
+                _promise.borrowOrLend  == "lend" ? "貸" : "借";
+                Share.share(
+                  "【 $_borrowOrLend 】${_promise.stuff}\n"
+                  "期限：${_promise.date.toString().substring(0,10)}\n"
+                  "相手：${_promise.user}\n"
+                  "#かしかりメモ"
+                );
+              }
+            },
           )
         ],
       ),

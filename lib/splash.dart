@@ -5,8 +5,14 @@ class Splash extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue,
       body: Center(
-        child: const Text("スプラッシュ画面"),
+        child:
+        FractionallySizedBox(
+          child: Image.asset('assets/note.png'),
+          heightFactor: 0.4,
+          widthFactor: 0.4,
+        ),
       ),
     );
   }
